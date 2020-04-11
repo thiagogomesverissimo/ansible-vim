@@ -27,3 +27,4 @@ vim_plugins:
 vim_vundle_version: 'v0.10.2'
 
 vimrc_recommended: true
+vimrc_bottom: ''
