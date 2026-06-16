@@ -1,45 +1,59 @@
----
-
 - name: '[user] Install default configuration'
-  template: src=vimrc.j2 dest="{{ vim_root_config }}" owner="{{ item }}" group="{{ item }}" mode=0644
-  with_items: "{{ vim_users }}"
-  when: (vim_users is defined and item != "root")
+  ansible.builtin.template:
+    src: vimrc.j2
+    dest: "{{ vim_root_config }}"
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: '0644'
+  loop: "{{ vim_users | default([]) }}"
+  when: item != "root"
   become_user: "{{ item }}"
   tags:
     - vim
 
 - name: '[user] Install default plugins'
-  template: src=vimrc.bundles.j2 dest="{{ vim_root_bundles }}" owner="{{ item }}" group="{{ item }}" mode=0644
-  with_items: "{{ vim_users }}"
-  when: (vim_users is defined and item != "root")
+  ansible.builtin.template:
+    src: vimrc.bundles.j2
+    dest: "{{ vim_root_bundles }}"
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: '0644'
+  loop: "{{ vim_users | default([]) }}"
+  when: item != "root"
   become_user: "{{ item }}"
   tags:
     - vim
 
 - name: '[user] Install vimrc.recommended'
-  template: src=vimrc.recommended.j2 dest="{{ vim_root_recommended }}" owner="{{ item }}" group="{{ item }}" mode=0644
-  with_items: "{{ vim_users }}"
-  when: (vim_users is defined and item != "root")
+  ansible.builtin.template:
+    src: vimrc.recommended.j2
+    dest: "{{ vim_root_recommended }}"
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: '0644'
+  loop: "{{ vim_users | default([]) }}"
+  when: item != "root"
   become_user: "{{ item }}"
   tags:
     - vim
 
 - name: '[user] Install Vundle'
-  git:
-    repo: https://github.com/gmarik/Vundle.vim.git
+  ansible.builtin.git:
+    repo: https://github.com/VundleVim/Vundle.vim.git
     dest: "/home/{{ item }}/.vim/bundle/Vundle.vim"
     version: "{{ vim_vundle_version }}"
-    force: yes
-  with_items: "{{ vim_users }}"
-  when: (vim_users is defined and item != "root")
+    force: true
+  loop: "{{ vim_users | default([]) }}"
+  when: item != "root"
   become_user: "{{ item }}"
   tags:
     - vim
 
 - name: '[user] Download plugins'
-  command: "vim +PluginInstall +qal"
-  with_items: "{{ vim_users }}"
-  when: (vim_users is defined and item != "root")
+  ansible.builtin.command: vim +PluginInstall +qal
+  loop: "{{ vim_users | default([]) }}"
+  when: item != "root"
   become_user: "{{ item }}"
+  changed_when: false
   tags:
     - vim
